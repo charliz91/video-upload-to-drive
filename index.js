@@ -9,8 +9,10 @@ const app = express();
 const upload = multer({ dest: 'uploads/' });
 const port = process.env.PORT || 3000;
 
-// Autoriser toutes les origines (tu peux restreindre à ton domaine si tu préfères)
-app.use(cors());
+// ✅ ACTIVER CORS pour tous les domaines (ou restreindre à ton site)
+app.use(cors({
+  origin: '*', // Remplace '*' par 'https://www.silver-scooter.fr' pour plus de sécurité si tu veux
+}));
 
 const auth = new google.auth.GoogleAuth({
   keyFile: 'service-account.json',
@@ -39,19 +41,18 @@ app.post('/upload', upload.single('video'), async (req, res) => {
       fields: 'id'
     });
 
-    // Supprime le fichier temporaire après upload
-    fs.unlinkSync(filePath);
+    fs.unlinkSync(filePath); // nettoyage
     res.send('OK');
   } catch (err) {
-    console.error('Erreur lors de l’upload vers Drive :', err);
+    console.error('❌ Erreur Google Drive :', err);
     res.status(500).send('Erreur lors de l’upload');
   }
 });
 
 app.get('/', (req, res) => {
-  res.send('Backend vidéo prêt à recevoir des fichiers ✅');
+  res.send('✅ Backend opérationnel');
 });
 
 app.listen(port, () => {
-  console.log(`Serveur backend démarré sur le port ${port}`);
+  console.log(`🚀 Serveur démarré sur le port ${port}`);
 });
